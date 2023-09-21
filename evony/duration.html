@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <title>Evony - Duration</title>
+</head>
+<body>
+    <script>
+        function calc(input) {
+            var days = document.getElementById("days");
+            var months = document.getElementById("months");
+            var minutes = document.getElementById("minutes");
+            var x1000 = document.getElementById("x1000").checked
+                        ? 1000 : 1;
+            switch (input) {
+                case 'byday':
+                    months.value = Math.round(days.value / 30);
+                    minutes.value = Math.round(days.value * 1440 / x1000);
+                    break;
+                case 'bymonth':
+                    days.value = Math.round(months.value * 30);
+                    minutes.value = Math.round(days.value * 1440 / x1000);
+                    break;
+                case 'byminutes':
+                    days.value = Math.round(minutes.value / 1440 * x1000);
+                    months.value = Math.round(days.value / 30);
+                    break;
+                default:
+                    break;
+            }
+            console.log(input, x1000, days.value, months.value, minutes.value);
+        }
+        function toggle1k() {
+            var x1000 = document.getElementById("x1000").checked;
+            console.log('x1000=', x1000);
+            if (x1000) {
+                document.getElementById("minutes").value = document.getElementById("minutes").value / 1000;
+            } else {
+                document.getElementById("minutes").value = document.getElementById("minutes").value * 1000;
+            }
+        }
+    </script>
+    <div class="pure-g">
+        <div class="pure-u-1-24"></div>
+        <div class="pure-u-22-24">
+            <form class="pure-form pure-form-aligned">
+                <fieldset>
+                    <div class="pure-control-group">
+                        <label for="days">Days</label>
+                        <input type="number" id="days" placeholder="days" onkeyup="calc('byday')"/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="months">Months</label>
+                        <input type="number" id="months" placeholder="months" onkeyup="calc('bymonth')"/>
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="Minutes">Minutes</label>
+                        <input type="number" id="minutes" placeholder="minutes" onkeyup="calc('byminutes')"/>
+                    </div>
+                    <div class="pure-controls">
+                        <label for="x1000" class="pure-checkbox">
+                            <input type="checkbox" id="x1000" onchange="toggle1k()"/> x1000 minutes
+                        </label>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="pure-u-1-24"></div>
+    </div>
+
+</body>
+</html>
