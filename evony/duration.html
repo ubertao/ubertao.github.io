@@ -10,35 +10,41 @@
     <script>
         function calc(input) {
             var days = document.getElementById("days");
-            var months = document.getElementById("months");
+            var hours = document.getElementById("hours");
             var minutes = document.getElementById("minutes");
             var x1000 = document.getElementById("x1000").checked
                         ? 1000 : 1;
             switch (input) {
                 case 'byday':
-                    months.value = Math.round(days.value / 30);
+                    hours.value = Math.round(days.value / 24);
                     minutes.value = Math.round(days.value * 1440 / x1000);
                     break;
-                case 'bymonth':
-                    days.value = Math.round(months.value * 30);
-                    minutes.value = Math.round(days.value * 1440 / x1000);
+                case 'byhour':
+                    days.value = Math.round(hours.value * 24);
+                    minutes.value = Math.round(hours.value * 60 / x1000);
                     break;
                 case 'byminutes':
                     days.value = Math.round(minutes.value / 1440 * x1000);
-                    months.value = Math.round(days.value / 30);
+                    hours.value = Math.round(minutes.value / 60 * x1000);
                     break;
                 default:
                     break;
             }
-            console.log(input, x1000, days.value, months.value, minutes.value);
+            console.log(input, x1000, days.value, hours.value, minutes.value);
         }
         function toggle1k() {
             var x1000 = document.getElementById("x1000").checked;
+            var minutes = document.getElementById("minutes");
+            var minutesLabel = document.getElementById("minutes-label");
             console.log('x1000=', x1000);
             if (x1000) {
-                document.getElementById("minutes").value = document.getElementById("minutes").value / 1000;
+                minutesLabel.innerHTML = "K Mins";
+                minutes.ariaPlaceholder = "x1000 minutes";
+                minutes.value = Math.round(minutes.value / 1000);
             } else {
-                document.getElementById("minutes").value = document.getElementById("minutes").value * 1000;
+                minutesLabel.innerHTML = "Minutes";
+                minutes.ariaPlaceholder = "minutes";
+                minutes.value = minutes.value * 1000;
             }
         }
     </script>
@@ -52,16 +58,16 @@
                         <input type="number" id="days" placeholder="days" onkeyup="calc('byday')"/>
                     </div>
                     <div class="pure-control-group">
-                        <label for="months">Months</label>
-                        <input type="number" id="months" placeholder="months" onkeyup="calc('bymonth')"/>
+                        <label for="hours">Hours</label>
+                        <input type="number" id="hours" placeholder="hours" onkeyup="calc('byhour')"/>
                     </div>
                     <div class="pure-control-group">
-                        <label for="Minutes">Minutes</label>
-                        <input type="number" id="minutes" placeholder="minutes" onkeyup="calc('byminutes')"/>
+                        <label for="Minutes" id="minutes-label">K Mins</label>
+                        <input type="number" id="minutes" placeholder="x1000 minutes" onkeyup="calc('byminutes')"/>
                     </div>
                     <div class="pure-controls">
                         <label for="x1000" class="pure-checkbox">
-                            <input type="checkbox" id="x1000" onchange="toggle1k()"/> x1000 minutes
+                            <input type="checkbox" id="x1000" checked onchange="toggle1k()"/> x1000 minutes
                         </label>
                     </div>
                 </fieldset>
