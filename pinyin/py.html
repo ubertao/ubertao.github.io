@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <title>汉字拼音</title>
+    <style>
+        .vcenter {/*
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            */
+        }
+        .main {
+            /* horizontally centers in body */
+            width: 80%;
+            margin: 2em auto;
+        }
+        .key {
+            margin: 0.5em 0.2em;
+            padding: 0.3em 0.7em;
+        }
+        .main > div.pure-g {
+            margin: 0.5em;
+        }
+        .label {
+            color: white;
+            border-radius: 4px;
+            background: rgb(28, 184, 65);
+            width: 100%;
+            /* this is a green */
+        }
+        .btn {
+            color: white;
+            border-radius: 4px;
+        }
+        .btn-yes {
+            background: rgb(28, 184, 65);
+        }
+        .btn-no {
+            background: rgb(202, 60, 60);
+        }
+        .btn-delete {
+            width: 90%;
+            margin: 0.2em 0.2em;
+            background: rgb(255, 153, 0);
+        }
+        .btn-reset {
+            width: 90%;
+            margin: 0.2em 0.2em;
+            background: rgb(202, 60, 60);
+        }
+        .last-input {
+            border: 1px solid #ccc;
+            padding: 0.1em;
+        }
+    </style>
+    <script src="hanzi.js"></script>
+
+</head>
+<body>
+<div class="main vcenter">
+<div class="pure-g">
+    <div class="pure-u-1">
+        <label class="pure-button label">声母</label>
+    </div>
+</div>
+<div class="pure-g">
+    <div id="shengmu-list" class="pure-u-1"><!--
+        <button>b</button>
+        <button>p</button>
+        <button>m</button>
+        <button>f</button>
+    --></div>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1">
+        <label class="pure-button label">韵母</label>
+    </div>
+</div>
+<div class="pure-g">
+    <div id="yunmu-list" class="pure-u-1"><!--
+        <button>a</button>
+        <button>o</button>
+        <button>e</button>
+    --></div>
+</div>
+<div class="pure-g">
+    <div id="candidates-label" class="pure-u-1">
+        <label class="pure-button label">
+            候选字：
+            <span id="pinyin-text">请选择声母和韵母</span>
+        </label>
+    </div>
+</div>
+<div class="pure-g">
+    <div id="candidates-list" class="pure-u-4-5">
+
+    </div>
+</div>
+<!-- row of sentence -->
+<div class="pure-g">
+    <div class="pure-u-1">
+        <label class="pure-button label">句子</label>
+    </div>
+</div>
+<div class="pure-g">
+    <div id="sentence" class="pure-u-1">
+        <span id="sentence-text"></span>
+    </div>
+</div>
+<div class="pure-g">
+    <div class="pure-u-1-2">
+        <button class="pure-button btn btn-delete" onclick="deleteInput()">删除单字</button>
+    </div>
+    <div class="pure-u-1-2">
+        <button class="pure-button btn btn-reset" onclick="clearSentence()">清除句子</button>
+    </div>
+</div>
+</div>
+<script>
+    var selectedShengmu = "";
+    var selectedYunmu = "";
+    var selectedCandidate = "";
+    var currentSentence = "";
+    var shengmuList = [
+        ['b', 'p', 'm', 'f', 'd', 't', 'n', 'l'],
+        ['g', 'k', 'h', 'j', 'q', 'x'],
+        ['zh', 'ch', 'sh', 'z', 'c', 's'],
+        ['r', 'y', 'w', '无声母/']
+    ];
+    var yunmuList = [
+        ['a', 'o', 'e', 'i', 'u', 'ü/u:'],
+        ['ai', 'ei', 'ui', 'ao', 'ou', 'iu', ],
+        ['an', 'en', 'in', 'ie', 'üe/ue', 'er'],
+        ['un', 'ün/un', 'ang', 'eng', 'ing', 'ong']
+    ]
+    function selectShengmu(shengmu) {
+        selectedShengmu = shengmu.split("/").slice(-1)[0];
+        console.log("声母=", selectedShengmu);
+        showCandidates();
+    }
+    function selectYunmu(yunmu) {
+        selectedYunmu = yunmu.split("/").slice(-1)[0];
+        console.log("韵母=", selectedYunmu);
+        showCandidates();
+    }
+    function showCandidates() {
+        let pinyin = selectedShengmu + selectedYunmu;
+        var pinyinSpan = document.getElementById("pinyin-text");
+        pinyinSpan.innerHTML = pinyin;
+        var candidatesList = document.getElementById("candidates-list");
+        candidatesList.innerHTML = "";
+        if (pinyin in hanzi) {
+            // create buttons of candidates, each row has 5 buttons
+            // each button has a onclick event, which will call selectCandidate()
+            var candidates = hanzi[pinyin];
+            var row = document.createElement("div");
+            row.className = "";
+            for (var i = 0; i < candidates.length; i++) {
+                candidatesList.appendChild(row);
+                var button = document.createElement("button");
+                button.className = "pure-button key";
+                button.innerHTML = candidates[i];
+                button.onclick = selectCandidate;
+                row.appendChild(button);
+                if (i % 5 == 4) {
+                    row = document.createElement("div");
+                    row.className = "";
+                }
+            }
+
+        }
+        else {
+            candidatesList.innerHTML = "无此拼音";
+        }
+    }
+    function shengmuHandler(event) {
+        document.querySelectorAll('#shengmu-list button').forEach((btn) => {
+            btn.classList.remove('pure-button-primary');
+        });
+        event.target.classList.add('pure-button-primary');
+        selectShengmu(event.target.getAttribute("data-shengmu"));
+    }
+    function yunmuHandler(event) {
+        document.querySelectorAll('#yunmu-list button').forEach((btn) => {
+            btn.classList.remove('pure-button-primary');
+        });
+        event.target.classList.add('pure-button-primary');
+        selectYunmu(event.target.getAttribute("data-yunmu"));
+    }
+    function selectCandidate(event) {
+        selectedCandidate = event.target.innerHTML;
+        console.log("候选字=", selectedCandidate);
+        currentSentence += selectedCandidate;
+        var sentence = document.getElementById("sentence-text");
+        sentence.innerHTML = currentSentence;
+    }
+    function deleteInput() {
+        if (currentSentence.length == 0) return;
+        currentSentence = currentSentence.slice(0, -1);
+        var sentence = document.getElementById("sentence-text");
+        sentence.innerHTML = currentSentence;
+    }
+    function clearSentence() {
+        selectedShengmu = "";
+        selectedYunmu = "";
+        selectedCandidate = "";
+        document.querySelectorAll('#shengmu-list button').forEach((btn) => {
+            btn.classList.remove('pure-button-primary');
+        });
+        document.querySelectorAll('#yunmu-list button').forEach((btn) => {
+            btn.classList.remove('pure-button-primary');
+        });
+        var pinyinSpan = document.getElementById("pinyin-text");
+        pinyinSpan.innerHTML = "请选择声母和韵母";
+        var candidatesList = document.getElementById("candidates-list");
+        candidatesList.innerHTML = "";
+        currentSentence = "";
+        var sentence = document.getElementById("sentence-text");
+        sentence.innerHTML = currentSentence;
+    }
+
+    // create rows of buttons of shengmu
+    var shengmuButtons = document.getElementById("shengmu-list");
+    for (var shengmuRow of shengmuList) {
+        let row = document.createElement("div");
+        row.className = "";
+        for (var shengmu of shengmuRow) {
+            let button = document.createElement("button");
+            button.className = "pure-button key";
+            button.innerHTML = shengmu.split("/")[0];
+            button.setAttribute("data-shengmu", shengmu);
+            button.onclick = shengmuHandler;
+            row.appendChild(button);
+        }
+        shengmuButtons.appendChild(row);
+    }
+    // create rows of buttons of yunmu
+    var yunmuButtons = document.getElementById("yunmu-list");
+    for (var yunmuRow of yunmuList) {
+        let row = document.createElement("div");
+        row.className = "";
+        for (var yunmu of yunmuRow) {
+            let button = document.createElement("button");
+            button.className = "pure-button key";
+            button.innerHTML = yunmu.split("/")[0];
+            button.setAttribute("data-yunmu", yunmu);
+            button.onclick = yunmuHandler;
+            row.appendChild(button);
+        }
+        yunmuButtons.appendChild(row);
+    }
+</script>
+</body>
+</html>
