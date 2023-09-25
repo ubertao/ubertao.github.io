@@ -52,9 +52,17 @@
                 '冷': null,
                 '热': null,
                 '瘙痒': bodyParts,
-                '麻木': bodyParts
+                '麻木': bodyParts,
+                '恶心': null,
+                '有痰': null
             },
-            '疼痛': bodyParts,
+            '疼痛': {
+                '皮肤痛': bodyParts,
+                '肌肉痛': bodyParts,
+                '胸腹腔痛': bodyParts,
+                '神经痛': bodyParts,
+                '关节痛': bodyParts
+            },
             '姿态': {
                 '仰卧': null,
                 '俯卧': null,
@@ -74,7 +82,7 @@
                 }
             },
             '起居': { '洗漱': null, '擦洗': bodyParts, '睡眠': null, '吃药': null },
-            '排泄': { '大便': null, '小便': null, '呕吐': null, '吸痰': null},
+            '方便': { '大便': null, '小便': null },
             '饮食': {
                 '饮料': { '水': null, '茶': null, '牛奶': null, '果汁': null },
                 '水果': { '苹果': null, '香蕉': null, '葡萄': null },
@@ -97,26 +105,28 @@
             var menu = $('#menu');
             menu.empty();
             for (var key in menuItems) {
-                var isLeaf = menuItems[key] == null || typeof menuItems[key] === 'string';
+                var isLeaf = menuItems[key] == null;
                 var isImg =  typeof menuItems[key] === 'string' && menuItems[key].startsWith('#');
                 var buttonStyle = isLeaf ? 'btn-light': 'btn-primary';
                 var item = $(`<div class="row justify-content-center align-items-center g-2"><div class="col"><button class="btn ${buttonStyle}">${key}</button></div></div>`);
                 console.log(key, menuItems[key]);
-                item.click(function() {
-                    var text = $(this).text();
-                    var nextMenu = menuItems[text];
-                    if (isLeaf) {
-                        // navigate to page
-                        if (isImg) {
-                            console.log('image src=', menuItems[text].substring(1));
-                            $('#image-item').attr('src', menuItems[text].substring(1));
-                        }
-                    } else {
+                if (isImg) {
+                    imgSrc = menuItems[key].substring(1);
+                    item.click(function() {
+                        console.log('image src=', imgSrc);
+                        $('#image-item').attr('src', imgSrc);
+                    });
+                }
+                else if (!isLeaf) {
+                    item.click(function() {
+                        var text = $(this).text();
+                        var nextMenu = menuItems[text];
+
                         appendNavList(text, nextMenu);                    
                         // navigate to next level menu
                         navigate(text, nextMenu);
-                    }
-                });
+                    });
+                }
                 menu.append(item);
             }
 
