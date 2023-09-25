@@ -8,7 +8,11 @@
     <style>
         .main {
             width: 90%;
-            margin: 2em auto;            
+            margin: 2em auto;
+            font-size: 1.5em;            
+        }
+        .main button {
+            font-size: 1.2em;
         }
         #menu .row {
             margin: 0.5em auto;
@@ -31,26 +35,59 @@
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.slim.js"></script>
     <script>
+        var bodyParts = {
+            '头部': '#head.jpg',
+            '躯干': '#body.jpg',
+            '四肢': '#limb.jpg',
+        };
         var menu = {
-            '病痛': {
-                '头部': '#head.jpg',
-                '躯干': '#body.jpg',
-                '四肢': '#limb.jpg',
+            '询问': {
+                '日期/星期': null,
+                '时间': null,
+                '天气': null,
+                '病情': null,
+                '家人': { '老伴': null, '子女': null, '孙子女': null }
             },
-            '活动': { '翻身': null, '睡眠': null, '半躺': null, '吃药': null },
+            '不适': {
+                '冷': null,
+                '热': null,
+                '瘙痒': bodyParts,
+                '麻木': bodyParts
+            },
+            '疼痛': bodyParts,
+            '姿态': {
+                '仰卧': null,
+                '俯卧': null,
+                '左侧卧': null,
+                '右侧卧': null,
+                '半坐': null,
+                '坐直': null,
+                '局部调整': {
+                    '头部升高': null,
+                    '头部降低': null,
+                    '躯干升高': null,
+                    '躯干降低': null,
+                    '腰部垫高': null,
+                    '腰部降低': null,
+                    '腿部升高': null,
+                    '腿部降低': null
+                }
+            },
+            '起居': { '洗漱': null, '擦洗': bodyParts, '睡眠': null, '吃药': null },
             '排泄': { '大便': null, '小便': null, '呕吐': null, '吸痰': null},
             '饮食': {
                 '饮料': { '水': null, '茶': null, '牛奶': null, '果汁': null },
                 '水果': { '苹果': null, '香蕉': null, '葡萄': null },
                 '主食': { '米饭': null, '面条': null, '馒头': null, '饺子': null },
                 '肉类': { '鸡肉': null, '鸭肉': null, '鱼肉': null, '牛肉': null, '羊肉': null, '猪肉': null },
-                '蔬菜': { '青菜': null, '萝卜': null, '土豆': null }
+                '蔬菜': { '青菜': null, '萝卜': null, '土豆': null },
+                '零食': { '饼干': null, '糖果': null, '巧克力': null }
             },
             '联系': {
                 '家人': { '老伴': null, '子女': null, '孙子女': null },
                 '医护': { '医生': null, '护士': null, '护工': null }
             },
-            '娱乐': { '电视': null, '音乐': null, '阅读': null, '聊天': null, '散步': null },
+            '娱乐': { '手机': null, '电脑': null, '电视': null, '音乐': null, '阅读': null, '聊天': null, '散步': null },
         };
         function navigate(menuName, menuItems) {
             // populate #menu div with multi level menu items, 
