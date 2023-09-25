@@ -75,10 +75,10 @@
                             $('#image-item').attr('src', menuItems[text].substring(1));
                         }
                     } else {
+                        appendNavList(text, nextMenu);                    
                         // navigate to next level menu
                         navigate(text, nextMenu);
                     }
-                    appendNavList(text, nextMenu);                    
                 });
                 menu.append(item);
             }
