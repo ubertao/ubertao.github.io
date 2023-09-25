@@ -88,11 +88,15 @@
             var navList = $('#nav-list');
             // clear active status of all items
             navList.children().removeClass('active');
+            navList.children().attr('aria-current', '');
 
             var item = $(`<li class="breadcrumb-item active" aria-current="page">${text}</li>`);
             item.click(function() {
                 // clear all items after this item
                 $(this).nextAll().remove();
+                // make this item active
+                $(this).addClass('active');
+                $(this).attr('aria-current', 'page');
                 // clear image src
                 $('#image-item').attr('src', '');
                 // navigate to next level menu
@@ -103,13 +107,15 @@
 
 </script>
 </head>
-<body onload="navigate(null, menu)">
+<body onload="navigate(null, menu); appendNavList('总目录', menu)">
     <div class="main container-fluid">
         <div class="row justify-content-center align-items-center g-2">
             <div class="col ">
                 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                     <ol id="nav-list" class="breadcrumb">
+                        <!--
                         <li class="breadcrumb-item active" aria-current="page" onclick="navigate('总目录', menu)">总目录</li>
+                        -->
                     </ol>
                 </nav>
             </div>
