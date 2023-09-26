@@ -14,7 +14,7 @@
         #menu button {
             font-size: 1.2em;
         }
-        #image-item {
+        #body-parts {
             width: 100%;
         }
         #nav-list li {
@@ -115,22 +115,22 @@
                 var indicatorClass = isLeaf ? '' : isImg ? 'picture-ind' : 'expand-ind';
                 var buttonClass = isLeaf || isImg ? 'btn btn-outline-primary' 
                                 : key.endsWith('!') ? 'btn btn-danger' : 'btn btn-primary';
-                var item = $(`<button data-menu="${key}" class="${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
+                var imageSrc = isImg ? menuItems[key].substring(1) : '';
+                var item = $(`<button data-menu="${key}" data-image="${imageSrc}" class="${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
                 console.log(key, menuItems[key]);
-                if (isImg) {
-                    imgSrc = menuItems[key].substring(1);
-                    item.click(() => showBodyPartsImage(imgSrc));
-                }
-                else if (!isLeaf) {
-                    item.click(function() {
-                        var text = $(this).attr('data-menu');
-                        var nextMenu = menuItems[text];
 
-                        appendNavList(text, nextMenu);                    
+                item.click(function() {
+                    var text = $(this).attr('data-menu');
+                    var nextMenu = menuItems[text];
+                    // hide body parts image
+                    updateBodyPartsImage($(this));
+
+                    if (menuItems[text] != null && typeof menuItems[text] === 'object') {
+                        appendNavList(text, nextMenu);
                         // navigate to next level menu
                         navigate(text, nextMenu);
-                    });
-                }
+                    }
+                });
                 menu.append(item); 
             }
 
@@ -148,22 +148,22 @@
                 // make this item active
                 $(this).addClass('active');
                 $(this).attr('aria-current', 'page');
-                // hide body parts image
-                showBodyPartsImage(null);
                 // navigate to next level menu
                 navigate(text, nextMenu);
             });
             navList.append(item);
         }
-        function showBodyPartsImage(src) {
+        function updateBodyPartsImage(button) {
             // show body parts image with src
             // if src is null or empty, then hide the image
-            if (src == null || src == '') {
-                $('#body-parts').hide();
+            var src = button.attr('data-image');
+            console.log('src=', src);
+            $('#body-parts').attr('src', src);
+            if (!!src) {
+                $('#body-parts').show();
             }
             else {
-                $('#body-parts').attr('src', src);
-                $('#body-parts').show();
+                $('#body-parts').hide();
             }
         }
 
