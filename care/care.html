@@ -11,14 +11,8 @@
             margin: 2em auto;
             font-size: 1.5em;            
         }
-        .main button {
-            font-size: 1.2em;
-        }
-        #menu .row {
-            margin: 0.5em auto;
-        }
         #menu button {
-            width: 100%;
+            font-size: 1.2em;
         }
         #image-item {
             width: 100%;
@@ -31,37 +25,44 @@
             color: #000;
             text-decoration: none;
         }
+        .expand-ind {
+            float: right;
+        }
+        .expand-ind::after {
+            content: '▸';
+        }
+        .picture-ind {
+            float: right;
+        }
+        .picture-ind::after {
+            content: '🖼️';
+        }
+
     </style>
     <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.slim.js"></script>
     <script>
         var bodyParts = {
-            '头部': '#head.jpg',
+            '头颈': '#head.jpg',
             '躯干': '#body.jpg',
             '四肢': '#limb.jpg',
         };
         var menu = {
-            '询问': {
-                '日期/星期': null,
-                '时间': null,
-                '天气': null,
-                '病情': null,
-                '家人': { '老伴': null, '子女': null, '孙子女': null }
+            '方便!': { '大便': null, '小便': null },
+            '疼痛!': {
+                '皮肤痛': bodyParts,
+                '肌肉痛': bodyParts,
+                '胸腔/腹腔痛': bodyParts,
+                '头痛/牙痛/神经痛': bodyParts,
+                '关节痛': bodyParts
             },
-            '不适': {
+            '不适!': {
                 '冷': null,
                 '热': null,
                 '瘙痒': bodyParts,
                 '麻木': bodyParts,
                 '恶心': null,
                 '有痰': null
-            },
-            '疼痛': {
-                '皮肤痛': bodyParts,
-                '肌肉痛': bodyParts,
-                '胸腹腔痛': bodyParts,
-                '神经痛': bodyParts,
-                '关节痛': bodyParts
             },
             '姿态': {
                 '仰卧': null,
@@ -82,7 +83,6 @@
                 }
             },
             '起居': { '洗漱': null, '擦洗': bodyParts, '睡眠': null, '吃药': null },
-            '方便': { '大便': null, '小便': null },
             '饮食': {
                 '饮料': { '水': null, '茶': null, '牛奶': null, '果汁': null },
                 '水果': { '苹果': null, '香蕉': null, '葡萄': null },
@@ -91,9 +91,14 @@
                 '蔬菜': { '青菜': null, '萝卜': null, '土豆': null },
                 '零食': { '饼干': null, '糖果': null, '巧克力': null }
             },
-            '联系': {
+            '询问': {
                 '家人': { '老伴': null, '子女': null, '孙子女': null },
-                '医护': { '医生': null, '护士': null, '护工': null }
+                '医护': { '医生': null, '护士': null, '护工': null },
+                '日期/星期': null,
+                '时间': null,
+                '天气': null,
+                '病情': null,
+                '其他': null
             },
             '娱乐': { '手机': null, '电脑': null, '电视': null, '音乐': null, '阅读': null, '聊天': null, '散步': null },
         };
@@ -107,19 +112,18 @@
             for (var key in menuItems) {
                 var isLeaf = menuItems[key] == null;
                 var isImg =  typeof menuItems[key] === 'string' && menuItems[key].startsWith('#');
-                var buttonStyle = isLeaf ? 'btn-light': 'btn-primary';
-                var item = $(`<div class="row justify-content-center align-items-center g-2"><div class="col"><button class="btn ${buttonStyle}">${key}</button></div></div>`);
+                var indicatorClass = isLeaf ? '' : isImg ? 'picture-ind' : 'expand-ind';
+                var buttonClass = isLeaf || isImg ? 'btn btn-outline-primary' 
+                                : key.endsWith('!') ? 'btn btn-danger' : 'btn btn-primary';
+                var item = $(`<button data-menu="${key}" class="${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
                 console.log(key, menuItems[key]);
                 if (isImg) {
                     imgSrc = menuItems[key].substring(1);
-                    item.click(function() {
-                        console.log('image src=', imgSrc);
-                        $('#image-item').attr('src', imgSrc);
-                    });
+                    item.click(() => showBodyPartsImage(imgSrc));
                 }
                 else if (!isLeaf) {
                     item.click(function() {
-                        var text = $(this).text();
+                        var text = $(this).attr('data-menu');
                         var nextMenu = menuItems[text];
 
                         appendNavList(text, nextMenu);                    
@@ -127,7 +131,7 @@
                         navigate(text, nextMenu);
                     });
                 }
-                menu.append(item);
+                menu.append(item); 
             }
 
         }
@@ -144,12 +148,23 @@
                 // make this item active
                 $(this).addClass('active');
                 $(this).attr('aria-current', 'page');
-                // clear image src
-                $('#image-item').attr('src', '');
+                // hide body parts image
+                showBodyPartsImage(null);
                 // navigate to next level menu
                 navigate(text, nextMenu);
             });
             navList.append(item);
+        }
+        function showBodyPartsImage(src) {
+            // show body parts image with src
+            // if src is null or empty, then hide the image
+            if (src == null || src == '') {
+                $('#body-parts').hide();
+            }
+            else {
+                $('#body-parts').attr('src', src);
+                $('#body-parts').show();
+            }
         }
 
 </script>
@@ -168,14 +183,12 @@
             </div>
         </div>
     </div>
-    <div id="menu" class="main container-fluid">
-        <div class="row justify-content-center align-items-center g-2">
-            <div class="col">menu item</div>
-        </div>
+    <div id="menu" class="main d-grid gap-2">
+
     </div>
-    <div id="menu" class="main container-fluid">
+    <div class="main container-fluid">
         <div class="row justify-content-center align-items-center g-2">
-            <div class="col"><img id="image-item" src=""/></div>
+            <div class="col"><img id="body-parts" src=""/></div>
         </div>
     </div>
 
