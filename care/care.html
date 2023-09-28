@@ -12,7 +12,9 @@
             font-size: 1.5em;            
         }
         #menu button {
-            font-size: 1.2em;
+            font-size: 1.5em;
+            width: 45%;
+            margin: 2% 2%;
         }
         #body-parts {
             width: 100%;
@@ -52,9 +54,9 @@
             '疼痛!': {
                 '皮肤痛': bodyParts,
                 '肌肉痛': bodyParts,
-                '胸腔/腹腔痛': bodyParts,
-                '头痛/牙痛/神经痛': bodyParts,
-                '关节痛': bodyParts
+                '胸腹腔': bodyParts,
+                '关节痛': bodyParts,
+                '头痛<br>牙痛<br>神经痛': bodyParts
             },
             '不适!': {
                 '冷': null,
@@ -71,15 +73,15 @@
                 '右侧卧': null,
                 '半坐': null,
                 '坐直': null,
-                '局部调整': {
-                    '头部升高': null,
-                    '头部降低': null,
-                    '躯干升高': null,
-                    '躯干降低': null,
-                    '腰部垫高': null,
-                    '腰部降低': null,
-                    '腿部升高': null,
-                    '腿部降低': null
+                '调整': {
+                    '头部🔼': null,
+                    '头部🔽': null,
+                    '躯干🔼': null,
+                    '躯干🔽': null,
+                    '腰部🔼': null,
+                    '腰部🔽': null,
+                    '腿部🔼': null,
+                    '腿部🔽': null
                 }
             },
             '起居': { '洗漱': null, '擦洗': bodyParts, '睡眠': null, '吃药': null },
@@ -94,7 +96,7 @@
             '询问': {
                 '家人': { '老伴': null, '子女': null, '孙子女': null },
                 '医护': { '医生': null, '护士': null, '护工': null },
-                '日期/星期': null,
+                '日期': null,
                 '时间': null,
                 '天气': null,
                 '病情': null,
@@ -113,10 +115,10 @@
                 var isLeaf = menuItems[key] == null;
                 var isImg =  typeof menuItems[key] === 'string' && menuItems[key].startsWith('#');
                 var indicatorClass = isLeaf ? '' : isImg ? 'picture-ind' : 'expand-ind';
-                var buttonClass = isLeaf || isImg ? 'btn btn-outline-primary' 
-                                : key.endsWith('!') ? 'btn btn-danger' : 'btn btn-primary';
+                var buttonClass = isLeaf || isImg ? 'btn-outline-primary' 
+                                : key.endsWith('!') ? 'btn-danger' : 'btn-primary';
                 var imageSrc = isImg ? menuItems[key].substring(1) : '';
-                var item = $(`<button data-menu="${key}" data-image="${imageSrc}" class="${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
+                var item = $(`<button data-menu="${key}" data-image="${imageSrc}" class="col-6 btn ${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
                 console.log(key, menuItems[key]);
 
                 item.click(function() {
@@ -183,7 +185,7 @@
             </div>
         </div>
     </div>
-    <div id="menu" class="main d-grid gap-2">
+    <div id="menu" class="main">
 
     </div>
     <div class="main container-fluid">
