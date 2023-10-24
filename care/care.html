@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>护理沟通</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .main {
+            width: 90%;
+            margin: 2em auto;
+            font-size: 1.5em;            
+        }
+        #menu button {
+            font-size: 1.5em;
+            width: 45%;
+            margin: 2% 2%;
+        }
+        #body-parts {
+            width: 100%;
+        }
+        #nav-list li {
+            color: #007bff;
+            text-decoration: underline;
+        }
+        #nav-list li.active {
+            color: #000;
+            text-decoration: none;
+        }
+        .expand-ind {
+            float: right;
+        }
+        .expand-ind::after {
+            content: '▸';
+        }
+        .picture-ind {
+            float: right;
+        }
+        .picture-ind::after {
+            content: '🖼️';
+        }
+        /*
+        #body-part-modal .modal-content {
+            width: 100%;
+            height: 100%;
+        }
+        */
+
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.slim.js"></script>
+    <script>
+        var bodyParts = {
+            '头颈': '#head.jpg',
+            '躯干': '#body.jpg',
+            '四肢': '#limb.jpg',
+        };
+        var menu = {
+            '方便!': { '大便': null, '小便': null },
+            '疼痛!': {
+                '皮肤痛': {
+                    '头颈': '#amblyopia',
+                    '躯干': '#male_skin_04',
+                    '四肢': '#male_skin_04'
+                },
+                '肌肉痛': {
+                    '头颈': '#male_region_head_neck_18',
+                    '前胸': '#male_region_thorax_18',
+                    '后背': '#male_region_back_18',
+                    '上肢': '#male_region_upper_limb_18',
+                    '下肢': '#male_region_lower_limb_18'
+                },
+                '胸痛': '#male_region_thorax_18',
+                '腹痛': '#male_region_abdomen_18',
+                '关节痛': {
+                    '头颈': '#male_system_skeletal_18',
+                    '躯干': '#male_system_skeletal_18',
+                    '上肢': '#male_system_skeletal_18',
+                    '下肢': '#male_system_skeletal_18'
+                },
+                '头痛': '#male_region_head_neck_18',
+                '牙痛': '#gum_disease_gingivitis',
+                '神经痛': '#male_system_nervous_18'
+            },
+            '不适!': {
+                '冷': null,
+                '热': null,
+                '瘙痒': {
+                    '头颈': '#amblyopia',
+                    '躯干': '#male_skin_04',
+                    '四肢': '#male_skin_04'
+                },
+                '麻木': {
+                    '头颈': '#male_region_head_neck_18',
+                    '前胸': '#male_region_thorax_18',
+                    '后背': '#male_region_back_18',
+                    '上肢': '#male_region_upper_limb_18',
+                    '下肢': '#male_region_lower_limb_18'
+                },
+                '恶心': null,
+                '有痰': null
+            },
+            '姿态': {
+                '仰卧': null,
+                '俯卧': null,
+                '左侧卧': null,
+                '右侧卧': null,
+                '半坐': null,
+                '坐直': null,
+                '调整': {
+                    '头部🔼': null,
+                    '头部🔽': null,
+                    '躯干🔼': null,
+                    '躯干🔽': null,
+                    '腰部🔼': null,
+                    '腰部🔽': null,
+                    '腿部🔼': null,
+                    '腿部🔽': null
+                }
+            },
+            '起居': { 
+                '洗漱': null, 
+                '擦洗': {
+                    '头颈': null,
+                    '躯干': null,
+                    '上肢': null,
+                    '下肢': null
+                },
+                '睡眠': null, 
+                '吃药': null 
+            },
+            '饮食': {
+                '饮料': { '水': null, '茶': null, '牛奶': null, '果汁': null },
+                '水果': { '苹果': null, '香蕉': null, '葡萄': null },
+                '主食': { '米饭': null, '面条': null, '馒头': null, '饺子': null },
+                '肉类': { '鸡肉': null, '鸭肉': null, '鱼肉': null, '牛肉': null, '羊肉': null, '猪肉': null },
+                '蔬菜': { '青菜': null, '萝卜': null, '土豆': null },
+                '零食': { '饼干': null, '糖果': null, '巧克力': null }
+            },
+            '询问': {
+                '家人': { '老伴': null, '子女': null, '孙子女': null },
+                '医护': { '医生': null, '护士': null, '护工': null },
+                '日期': null,
+                '时间': null,
+                '天气': null,
+                '病情': null,
+                '其他': null
+            },
+            '娱乐': { '手机': null, '电脑': null, '电视': null, '音乐': null, '阅读': null, '聊天': null, '散步': null },
+        };
+        function navigate(menuName, menuItems) {
+            // populate #menu div with multi level menu items, 
+            // and bind click event to each item to navigate to next level menu
+            // if menu item is a leaf, then navigate to the corresponding page
+
+            var menu = $('#menu');
+            menu.empty();
+            for (var key in menuItems) {
+                var isLeaf = menuItems[key] == null;
+                var isBodyPart =  typeof menuItems[key] === 'string' && menuItems[key].startsWith('#');
+                var indicatorClass = isLeaf ? '' : isBodyPart ? 'picture-ind' : 'expand-ind';
+                var buttonClass = isLeaf || isBodyPart ? 'btn-outline-primary' 
+                                : key.endsWith('!') ? 'btn-danger' : 'btn-primary';
+                var bodyPart = isBodyPart ? menuItems[key].substring(1) : '';
+                var item = $(`<button data-menu="${key}" data-body-part="${bodyPart}" class="col-6 btn ${buttonClass}">${key}<span class="${indicatorClass}"/></button>`);
+                console.log(key, menuItems[key]);
+
+                item.click(function() {
+                    var text = $(this).attr('data-menu');
+                    var nextMenu = menuItems[text];
+                    // show/hide body parts image
+                    updateBodyPart($(this));
+
+                    if (menuItems[text] != null && typeof menuItems[text] === 'object') {
+                        appendNavList(text, nextMenu);
+                        // navigate to next level menu
+                        navigate(text, nextMenu);
+                    }
+                });
+                menu.append(item); 
+            }
+
+        }
+        function appendNavList(text, nextMenu) {
+            var navList = $('#nav-list');
+            // clear active status of all items
+            navList.children().removeClass('active');
+            navList.children().attr('aria-current', '');
+
+            var item = $(`<li class="breadcrumb-item active" aria-current="page">${text}</li>`);
+            item.click(function() {
+                // clear all items after this item
+                $(this).nextAll().remove();
+                // make this item active
+                $(this).addClass('active');
+                $(this).attr('aria-current', 'page');
+                // navigate to next level menu
+                navigate(text, nextMenu);
+            });
+            navList.append(item);
+        }
+        var bodyPartModal;
+        function updateBodyPart(button) {
+            var baseUrl = 'https://human.biodigital.com/widget';
+            var devKey = '3a8393dc4c2976398b506f6835512fbefaa9a46e';
+            // show body parts image with src
+            // if src is null or empty, then hide the image
+            var model = button.attr('data-body-part');
+            console.log('model=', model);
+            var src = !!model ? `${baseUrl}/?m=${model}&dk=${devKey}` : '';
+            $('#body-parts').attr('src', src);
+            if (!!src) {
+                bodyPartModal = new bootstrap.Modal('#body-part-modal');
+                bodyPartModal.show();
+            }
+            else if (!!bodyPartModal) {
+                bodyPartModal.dispose();
+            }
+        }
+
+</script>
+</head>
+<body onload="navigate(null, menu); appendNavList('总目录', menu)">
+    <div class="main container-fluid">
+        <div class="row justify-content-center align-items-center g-2">
+            <div class="col ">
+                <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <ol id="nav-list" class="breadcrumb">
+                        <!--
+                        <li class="breadcrumb-item active" aria-current="page" onclick="navigate('总目录', menu)">总目录</li>
+                        -->
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div id="menu" class="main">
+
+    </div>
+    <div id="body-part-modal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">选择部位</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="body-parts" width="100%" height="100%"
+                    src="https://human.biodigital.com/widget/?m=amblyopia&dk=3a8393dc4c2976398b506f6835512fbefaa9a46e">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+      </div>    
+
+    <script src="https://developer.biodigital.com/builds/api/2/human-api.min.js"></script>
+
+</body>
+</html>
