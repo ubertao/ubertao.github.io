@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Wack-a-Mole</title>
+        <style>
+            body {
+                margin: 0 0;
+            }
+            #score {
+                font-size: 5em;
+                text-align: center;
+                background-color: darkgreen;
+                color: white;
+                font-family: 'Press Start 2P', cursive;
+            }
+            #start {
+                margin: 0 auto;
+                padding: 2rem 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 80%;
+                height: 6rem;
+                background-color: darkgreen;
+                border: 10px solid rgba(155, 87, 35, 0.85);
+                box-shadow: 5px 5px 0 rgba(47, 46, 46, 0.85);
+                border-radius: 7px;
+                color: white;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 3rem;
+                /* float at the center of the screen */
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+
+            }
+            #start button {
+                width: 50%;
+                background-color: rgba(155, 87, 35, 0.85);
+                border: 2px solid darkgreen;
+                border-radius: 7px;
+                color: white;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 2rem;
+            }
+            .grid {
+                display: flex;
+                flex-wrap: wrap;
+                width: 72%;
+                height: 100%;
+                margin: 0 auto;
+                padding: 20% 14%;
+                background-image: url("grass.jpg");
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+                justify-content: center;
+            }
+            .hole {
+                width: 33%;
+                aspect-ratio: 2/3;
+                background-image: url("hole.png");
+                background-size: 100% 100%;
+                background-repeat: no-repeat;
+            }
+            .mole {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .mole.hidden {
+                content: url("blank.png");
+            }
+            .mole.up {
+                content: url("mole.png");
+            }
+            .mole.wacked {
+                content: url("wacked.png");
+            }
+        </style>
+    </head>
+    <body>
+        <div id="score">0</div>
+        <div class="grid">
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+            <div class="hole"><img class="mole hidden"></div>
+        </div>
+        <div id="start">
+            <span id="message">New Game</span>
+            <button onclick="startGame()">Start!</button>
+        </div>
+        <audio id="sfx-hit" src="hit.wav"></audio>
+        <audio id="sfx-miss" src="miss.wav"></audio>
+        <script>
+            const holes = document.querySelectorAll('.hole');
+            const scoreBoard = document.getElementById('score');
+            const moles = document.querySelectorAll('.mole');
+            let lastMole;
+            let timeUp = false;
+            let score = 0;
+
+            function randomTime(min, max) {
+                return Math.round(Math.random() * (max - min) + min);
+            }
+
+            function randomMole(moles) {
+                const idx = Math.floor(Math.random() * moles.length);
+                const mole = moles[idx];
+                if (mole === lastMole) {
+                    console.log('Ah nah thats the same one bud');
+                    return randomMole(moles);
+                }
+                lastMole = mole;
+                return mole;
+            }
+
+            function peep() {
+                if (lastMole)
+                    lastMole.classList.remove('wacked');
+                const time = randomTime(500, 1000);
+                const mole = randomMole(moles);
+                mole.classList.add('up');
+                setTimeout(() => {
+                    mole.classList.remove('up');
+                    if (!timeUp) peep();
+                }, time);
+            }
+
+            function gameOver() {
+                timeUp = true;
+                // show start screen
+                document.getElementById('message').textContent = 'Time\'s Up!';
+                document.getElementById('start').style.display = 'flex';
+            }
+
+            function startGame() {
+                const TIME_OUT = 20000;
+                scoreBoard.textContent = 0;
+                timeUp = false;
+                score = 0;
+                // hide start screen
+                document.getElementById('start').style.display = 'none';
+                peep();
+                setTimeout(gameOver, TIME_OUT);
+            }
+
+            function bonk(e) {
+                if (this.classList.contains('up')) {
+                    score++;
+                    this.classList.remove('up');
+                    this.classList.add('wacked');
+                    // play hit sound
+                    document.getElementById('sfx-hit').play();
+                }
+                else
+                    // play miss sound
+                    document.getElementById('sfx-miss').play();
+                scoreBoard.textContent = score;
+            }
+
+            moles.forEach(mole => mole.addEventListener('click', bonk));
+
+            //startGame();
+        </script>
+    </body>
+</html>
