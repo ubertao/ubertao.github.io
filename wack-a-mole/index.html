@@ -11,7 +11,6 @@
                 text-align: center;
                 background-color: darkgreen;
                 color: white;
-                font-family: 'Press Start 2P', cursive;
             }
             #start {
                 margin: 0 auto;
@@ -27,7 +26,6 @@
                 box-shadow: 5px 5px 0 rgba(47, 46, 46, 0.85);
                 border-radius: 7px;
                 color: white;
-                font-family: 'Press Start 2P', cursive;
                 font-size: 3rem;
                 /* float at the center of the screen */
                 position: absolute;
@@ -42,7 +40,6 @@
                 border: 2px solid darkgreen;
                 border-radius: 7px;
                 color: white;
-                font-family: 'Press Start 2P', cursive;
                 font-size: 2rem;
             }
             .grid {
@@ -126,7 +123,7 @@
             function peep() {
                 if (lastMole)
                     lastMole.classList.remove('wacked');
-                const time = randomTime(500, 1000);
+                const time = randomTime(800, 1200);
                 const mole = randomMole(moles);
                 mole.classList.add('up');
                 setTimeout(() => {
